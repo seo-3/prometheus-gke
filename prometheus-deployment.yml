@@ -1,0 +1,91 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: monitor
+  name: monitor
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: monitor
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: monitor
+    spec:
+      serviceAccountName: monitor
+      containers:
+      - image: prom/prometheus:v2.1.0
+        args:
+        - --config.file=/mnt/etc/prometheus.yml
+        imagePullPolicy: Always
+        name: prometheus
+        readinessProbe:
+          httpGet:
+            path: /graph
+            port: 9090
+          periodSeconds: 10
+          initialDelaySeconds: 0
+          failureThreshold: 10
+          successThreshold: 1
+        ports:
+        - containerPort: 9090
+          protocol: TCP
+        resources: {}
+        volumeMounts:
+        - mountPath: /prometheus
+          name: prometheus-pvc
+        - mountPath: /mnt/etc/
+          name: config-volume
+        securityContext:
+          runAsUser: 0
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      - image: grafana/grafana:latest
+        imagePullPolicy: Always
+        name: grafana
+        readinessProbe:
+          httpGet:
+            path: /login
+            port: 3000
+          periodSeconds: 10
+          initialDelaySeconds: 0
+          failureThreshold: 10
+          successThreshold: 1
+        env:
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: gf-security-admin-password
+              key: password
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/grafana
+          name: grafana-pvc
+        securityContext:
+          runAsUser: 0
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: prometheus-pvc
+        persistentVolumeClaim:
+          claimName: prometheus-pvc
+      - name: grafana-pvc
+        persistentVolumeClaim:
+          claimName: grafana-pvc
+          volumes:
+      - name: config-volume
+        configMap:
+          name: prometheus-config

@@ -1,0 +1,11 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+spec:
+  rules:
+  - host: <your_host_name>
+    http:
+      paths:
+      - backend:
+          serviceName: monitor
+          servicePort: 3000
+
