@@ -33,6 +33,10 @@ $ kubectl create clusterrolebinding monitor --clusterrole=all-reader --serviceac
 $ kubectl -n monitoring apply -f https://github.com/seo-3/prometheus-gke/prometheus-configmap.yml
 ```
 
+```
+$ kubectl -n monitoring apply -f https://github.com/seo-3/prometheus-gke/alertmanager-configmap.yaml
+```
+
 ### Volume
 ```
 $ kubectl -n monitoring apply -f https://github.com/seo-3/prometheus-gke/volume.yml
