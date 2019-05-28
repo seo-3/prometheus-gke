@@ -57,6 +57,7 @@ $ kubectl -n monitoring apply -f https://github.com/seo-3/prometheus-gke/prometh
 ```
 
 ### DaemonSet
+set node-exporter.
 
 ```
 $ kubectl -n monitoring apply -f https://github.com/seo-3/prometheus-gke/daemonset.yaml
