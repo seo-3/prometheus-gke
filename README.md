@@ -56,6 +56,13 @@ Include grafana and prometheus in deployment.
 $ kubectl -n monitoring apply -f https://github.com/seo-3/prometheus-gke/prometheus-deployment.yml
 ```
 
+### DaemonSet
+
+```
+$ kubectl -n monitoring apply -f https://github.com/seo-3/prometheus-gke/daemonset.yaml
+```
+
+
 ### Service
 
 ```
